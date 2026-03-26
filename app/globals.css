@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Dancing+Script:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@utility prose-elegant {
+  --tw-prose-headings: var(--dark-brown);
+  --tw-prose-body: var(--dark-brown);
+  --tw-prose-bold: var(--dark-brown);
+  --tw-prose-links: var(--olive-green);
+  --tw-prose-bullet-color: var(--terracotta);
+  --tw-prose-quotes: var(--olive-green);
+  --tw-prose-quote-borders: var(--terracotta);
+}
+
+@theme {
+  --color-primary: #6B8E23;
+  --color-olive-green: #6B8E23;
+  --color-terracotta: #C65D3B;
+  --color-cream: #FDF6EC;
+  --color-deep-red: #8B0000;
+  --color-dark-brown: #3E2C23;
+  --color-light-olive: #8FAD4A;
+  --color-warm-beige: #E8DCC8;
+  --color-palestinian-green: #007A3D;
+
+  --font-serif-elegant: "Cormorant Garamond", serif;
+  --font-handwritten: "Dancing Script", cursive;
+  --font-sans: "Inter", sans-serif;
+
+  --radius: 0.75rem;
+}
+
+:root {
+  --radius: 0.75rem;
+  --olive-green: #6B8E23;
+  --terracotta: #C65D3B;
+  --cream: #FDF6EC;
+  --deep-red: #8B0000;
+  --dark-brown: #3E2C23;
+  --light-olive: #8FAD4A;
+  --warm-beige: #E8DCC8;
+  --palestinian-green: #007A3D;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--cream);
+  color: var(--dark-brown);
+  scroll-behavior: smooth;
+}
+
+/* Tatreez Pattern Background */
+.tatreez-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236B8E23' fill-opacity='0.06'%3E%3Cpath d='M30 0l5 10-5 10-5-10L30 0zm0 40l5 10-5 10-5-10 5-10zm-30-20l5 10-5 10-5-10L0 20zm60 0l5 10-5 10-5-10 5-10zM15 10l5 10-5 10-5-10 5-10zm30 0l5 10-5 10-5-10 5-10zm-30 30l5 10-5 10-5-10 5-10zm30 0l5 10-5 10-5-10 5-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.tatreez-pattern-red {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C65D3B' fill-opacity='0.08'%3E%3Cpath d='M30 0l5 10-5 10-5-10L30 0zm0 40l5 10-5 10-5-10 5-10zm-30-20l5 10-5 10-5-10L0 20zm60 0l5 10-5 10-5-10 5-10zM15 10l5 10-5 10-5-10 5-10zm30 0l5 10-5 10-5-10 5-10zm-30 30l5 10-5 10-5-10 5-10zm30 0l5 10-5 10-5-10 5-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.tatreez-border {
+  background: linear-gradient(90deg,
+      var(--olive-green) 0%,
+      var(--terracotta) 25%,
+      var(--deep-red) 50%,
+      var(--terracotta) 75%,
+      var(--olive-green) 100%);
+  height: 4px;
+}
+
+.recipe-card {
+  transition: all 0.3s ease;
+}
+
+.recipe-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(62, 44, 35, 0.15);
+}
+
+.tips-box {
+  background: linear-gradient(135deg, #FDF6EC 0%, #E8DCC8 100%);
+  border-left: 4px solid var(--terracotta);
+}
+
+.story-box {
+  background: linear-gradient(135deg, rgba(107, 142, 35, 0.1) 0%, rgba(232, 220, 200, 0.5) 100%);
+  border-left: 4px solid var(--olive-green);
+}
+
+.story-box-red {
+  background: linear-gradient(135deg, rgba(198, 93, 59, 0.1) 0%, rgba(232, 220, 200, 0.5) 100%);
+  border-left: 4px solid var(--terracotta);
+}
+
+.img-hover-zoom {
+  overflow: hidden;
+}
+
+.img-hover-zoom img {
+  transition: transform 0.5s ease;
+}
+
+.img-hover-zoom:hover img {
+  transform: scale(1.08);
+}
+
+.badge-lebanese {
+  background-color: var(--deep-red) !important;
+  color: white !important;
+}
+
+.badge-palestinian {
+  background-color: #4A6318 !important;
+  /* Darker green for Palestinian heritage */
+  color: white !important;
+}
+
+.bg-palestinian-subtle {
+  background-color: rgba(232, 220, 200, 0.4) !important;
+  /* Slightly darker/warmer background */
+}
+
+.gradient-overlay {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 50%);
+  pointer-events: none;
+}

@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String   @default("VIEWER") // ADMIN, CONTENT_MANAGER, VIEWER
+  createdAt DateTime @default(now())
+}
+
+model Recipe {
+  id           String      @id @default(cuid())
+  title        String
+  description  String
+  image        String
+  category     String      // lebanese, palestinian
+  type         String      // main, appetizer, dessert, salad, soup, beverage
+  prepTime     String
+  cookTime     String
+  servings     Int
+  difficulty   String      // easy, medium, hard
+  ingredients  String      // Store as JSON string array
+  instructions String      // Store as JSON string array
+  tips         String
+  story        String
+  featured     Boolean     @default(false)
+  recipeOfWeek Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  submissions  Submission[]
+}
+
+model Blog {
+  id        String   @id @default(cuid())
+  title     String
+  excerpt   String
+  content   String
+  image     String
+  author    String
+  category  String
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+}
+
+model News {
+  id        String   @id @default(cuid())
+  title     String
+  excerpt   String
+  content   String
+  image     String
+  category  String
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+}
+
+model Submission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  type      String   // CONTACT, INTEREST
+  recipeId  String?
+  recipe    Recipe?  @relation(fields: [recipeId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  author    String   @default("Anonymous")
+  recipeId  String
+  replies   Reply[]
+  createdAt DateTime @default(now())
+}
+
+model Reply {
+  id        String   @id @default(cuid())
+  content   String
+  author    String   @default("Mama Montaha")
+  commentId String
+  comment   Comment  @relation(fields: [commentId], references: [id])
+  createdAt DateTime @default(now())
+}
+
