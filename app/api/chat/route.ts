@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -7,18 +8,12 @@ export async function POST(req: Request) {
     const { messages } = await req.json();
     const lastMessage = messages[messages.length - 1].content;
 
-    // Fetch recipes to provide context
-    const recipes = await prisma.recipe.findMany({
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        ingredients: true,
-        instructions: true,
-        category: true,
-        story: true,
-      },
-    });
+    // Fetch recipes from Firestore to provide context
+    const recipesSnapshot = await getDocs(collection(db, "recipes"));
+    const recipes = recipesSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as any[];
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {

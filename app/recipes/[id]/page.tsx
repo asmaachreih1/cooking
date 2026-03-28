@@ -61,13 +61,24 @@ export default function RecipeDetailPage({ params }: { params: Promise<{ id: str
         );
     }
 
+    if (!recipe) {
+        return (
+            <div className="min-h-screen bg-cream flex flex-col items-center justify-center gap-4">
+                <p className="text-dark-brown/60 font-serif-elegant text-xl">Recipe not found</p>
+                <Link href="/recipes" className="text-olive-green hover:underline">
+                    {t('recipeDetail.backToRecipes')}
+                </Link>
+            </div>
+        );
+    }
+
     return (
         <div className="bg-cream min-h-screen">
             {/* Hero */}
             <section className="relative h-[40vh] md:h-[60vh] min-h-[350px] md:min-h-[500px]">
                 <img
                     src={recipe.image}
-                    alt={recipe.title}
+                    alt={df(recipe, 'title')}
                     className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-dark-brown via-dark-brown/50 to-transparent" />
@@ -85,15 +96,15 @@ export default function RecipeDetailPage({ params }: { params: Promise<{ id: str
                         <div className="flex flex-wrap gap-3 mb-4">
                             <span className={`px-4 py-1 rounded-full text-sm font-medium ${recipe.category === 'lebanese' ? 'badge-lebanese' : 'badge-palestinian'
                                 }`}>
-                                {recipe.category === 'lebanese' ? t('recipeCard.lebanese') : t('recipeCard.palestinian')}
+                                {t(`recipes.${recipe.category}`)}
                             </span>
                             <span className="bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full text-sm capitalize">
-                                {recipe.type}
+                                {t(`recipes.${recipe.type}`)}
                             </span>
                             <span className={`px-4 py-1 rounded-full text-sm capitalize ${recipe.difficulty === 'easy' ? 'bg-olive-green' :
                                 recipe.difficulty === 'medium' ? 'bg-terracotta' : 'bg-deep-red'
                                 }`}>
-                                {t(`recipeCard.${recipe.difficulty}`)}
+                                {t(`recipes.${recipe.difficulty}`)}
                             </span>
                         </div>
 
@@ -235,7 +246,7 @@ export default function RecipeDetailPage({ params }: { params: Promise<{ id: str
 
 
                             <div id="questions">
-                                <QuestionSection recipeId={recipe.id} category={recipe.category} />
+                                <QuestionSection recipeId={recipe.id} category={recipe.category as any} />
                             </div>
                         </div>
                     </div>
@@ -247,7 +258,7 @@ export default function RecipeDetailPage({ params }: { params: Promise<{ id: str
                 <section className="py-12 bg-warm-beige/30">
                     <div className="container mx-auto px-4">
                         <h2 className="font-serif-elegant text-3xl text-dark-brown mb-10 text-center">
-                            {t('recipeDetail.moreRecipes').replace('{category}', recipe.category === 'lebanese' ? t('recipeCard.lebanese') : t('recipeCard.palestinian'))}
+                            {t('recipeDetail.moreRecipes').replace('{category}', t(`recipes.${recipe.category}`))}
                         </h2>
                         <div className="grid md:grid-cols-3 gap-8">
                             {relatedRecipes.map((r) => (

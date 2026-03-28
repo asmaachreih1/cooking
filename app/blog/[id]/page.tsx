@@ -8,9 +8,11 @@ import { doc, getDoc, collection, query, limit, getDocs } from 'firebase/firesto
 import BlogCard from '@/components/shared/BlogCard';
 import ReactMarkdown from 'react-markdown';
 import { BlogPost } from '@/types';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function BlogDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
+    const { t, language, isRTL, df } = useLanguage();
     const [post, setPost] = useState<BlogPost | null>(null);
     const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
@@ -52,7 +54,7 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
         return (
             <div className="min-h-screen bg-cream flex flex-col items-center justify-center gap-4">
                 <Loader2 className="w-12 h-12 text-olive-green animate-spin" />
-                <p className="text-dark-brown/60 font-serif-elegant text-xl">Loading story...</p>
+                <p className="text-dark-brown/60 font-serif-elegant text-xl">{t('blog.loadingPost')}</p>
             </div>
         );
     }
@@ -61,9 +63,9 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
         return (
             <div className="min-h-screen bg-cream flex items-center justify-center">
                 <div className="text-center">
-                    <h2 className="font-serif-elegant text-3xl text-dark-brown mb-4">Post Not Found</h2>
+                    <h2 className="font-serif-elegant text-3xl text-dark-brown mb-4">{t('blog.postNotFound')}</h2>
                     <Link href="/blog" className="text-olive-green hover:text-terracotta transition-colors">
-                        ← Back to Blog
+                        {isRTL ? '←' : '←'} {t('blog.backToBlog')}
                     </Link>
                 </div>
             </div>
@@ -71,7 +73,7 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
     }
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+        return new Date(dateString).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', {
             month: 'long',
             day: 'numeric',
             year: 'numeric'
@@ -79,32 +81,32 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
     };
 
     return (
-        <div className="bg-cream min-h-screen">
+        <div className="bg-cream min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
             {/* Hero */}
             <section className="relative h-[50vh] min-h-[400px]">
                 <img
                     src={post.image}
-                    alt={post.title}
+                    alt={df(post, 'title')}
                     className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-dark-brown via-dark-brown/50 to-transparent" />
 
-                <div className="absolute bottom-0 left-0 right-0 p-8 text-cream">
+                <div className={`absolute bottom-0 ${isRTL ? 'right-0' : 'left-0'} right-0 p-8 text-cream`}>
                     <div className="container mx-auto max-w-4xl">
                         <Link
                             href="/blog"
                             className="inline-flex items-center gap-2 text-cream/80 hover:text-cream mb-4 transition-colors"
                         >
-                            <ArrowLeft className="w-4 h-4" />
-                            Back to Blog
+                            <ArrowLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+                            {t('blog.backToBlog')}
                         </Link>
 
                         <span className="inline-block bg-olive-green/80 px-4 py-1 rounded-full text-sm font-medium mb-4">
-                            {post.category}
+                            {df(post, 'category')}
                         </span>
 
                         <h1 className="font-serif-elegant text-4xl md:text-5xl mb-4">
-                            {post.title}
+                            {df(post, 'title')}
                         </h1>
 
                         <div className="flex flex-wrap items-center gap-6 text-cream/80">
@@ -118,7 +120,7 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
                             </div>
                             <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4" />
-                                <span>5 min read</span>
+                                <span>{post.readTime || '5 min read'}</span>
                             </div>
                         </div>
                     </div>
@@ -133,10 +135,10 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
                         <article className="lg:col-span-3">
                             <div className="bg-white rounded-3xl p-8 md:p-16 shadow-soft border border-warm-beige/20 text-dark-brown relative overflow-hidden">
                                 {/* Decorative Corner Pattern */}
-                                <div className="absolute -top-12 -right-12 w-32 h-32 tatreez-pattern opacity-10 rotate-12" />
-                                <div className="absolute -bottom-12 -left-12 w-32 h-32 tatreez-pattern-red opacity-10 -rotate-12" />
+                                <div className={`absolute -top-12 ${isRTL ? '-left-12 rotate-[-12deg]' : '-right-12 rotate-12'} w-32 h-32 tatreez-pattern opacity-10`} />
+                                <div className={`absolute -bottom-12 ${isRTL ? '-right-12 rotate-[12deg]' : '-left-12 rotate-[-12deg]'} w-32 h-32 tatreez-pattern-red opacity-10`} />
 
-                                <div className="prose prose-elegant prose-lg md:prose-xl max-w-none 
+                                <div className={`prose prose-elegant prose-lg md:prose-xl max-w-none 
                                     prose-headings:font-serif-elegant prose-headings:font-semibold
                                     prose-p:leading-relaxed prose-p:mb-8
                                     prose-strong:text-terracotta prose-strong:font-bold
@@ -146,10 +148,10 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
                                     [&>p:first-of-type]:first-letter:font-serif-elegant 
                                     [&>p:first-of-type]:first-letter:font-bold 
                                     [&>p:first-of-type]:first-letter:text-olive-green 
-                                    [&>p:first-of-type]:first-letter:mr-4 
+                                    ${isRTL ? '[&>p:first-of-type]:first-letter:ml-4' : '[&>p:first-of-type]:first-letter:mr-4'} 
                                     [&>p:first-of-type]:first-letter:float-left 
-                                    [&>p:first-of-type]:first-letter:leading-none">
-                                    <ReactMarkdown>{post.content}</ReactMarkdown>
+                                    [&>p:first-of-type]:first-letter:leading-none ${isRTL ? 'text-right' : 'text-left'}`}>
+                                    <ReactMarkdown>{df(post, 'content')}</ReactMarkdown>
                                 </div>
 
                                 {/* Decorative Divider */}
@@ -169,12 +171,12 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
                                         </div>
                                         <div>
                                             <p className="font-serif-elegant text-xl text-dark-brown leading-none">{post.author}</p>
-                                            <p className="text-xs text-dark-brown/50 mt-1 uppercase tracking-widest font-bold">The Author</p>
+                                            <p className="text-xs text-dark-brown/50 mt-1 uppercase tracking-widest font-bold">{t('blog.theAuthor') || 'The Author'}</p>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-4">
-                                        <span className="font-medium text-dark-brown text-sm uppercase tracking-wider">Share This Story:</span>
+                                        <span className="font-medium text-dark-brown text-sm uppercase tracking-wider">{t('blog.shareStory') || 'Share This Story:'}</span>
                                         <div className="flex gap-3">
                                             <button className="w-10 h-10 hover:scale-110 bg-[#1877F2] text-white rounded-full flex items-center justify-center transition-all shadow-md">
                                                 <Facebook className="w-5 h-5" />
@@ -195,32 +197,32 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
                         <aside className="lg:col-span-1">
                             <div className="sticky top-24 space-y-8">
                                 {/* Author */}
-                                <div className="bg-white rounded-2xl p-6 shadow-soft border border-warm-beige/20">
-                                    <h3 className="font-serif-elegant text-lg text-dark-brown mb-4">About the Author</h3>
-                                    <div className="flex items-center gap-4">
+                                <div className={`bg-white rounded-2xl p-6 shadow-soft border border-warm-beige/20 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                    <h3 className="font-serif-elegant text-lg text-dark-brown mb-4">{t('blog.aboutAuthor') || 'About the Author'}</h3>
+                                    <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                         <div className="w-16 h-16 bg-olive-green/20 rounded-full flex items-center justify-center text-olive-green font-bold text-2xl">
                                             {post.author[0]}
                                         </div>
                                         <div>
                                             <p className="font-medium text-dark-brown">{post.author}</p>
-                                            <p className="text-sm text-dark-brown/60">Recipe Keeper</p>
+                                            <p className="text-sm text-dark-brown/60">{t('blog.recipeKeeper') || 'Recipe Keeper'}</p>
                                         </div>
                                     </div>
                                     <p className="mt-4 text-xs text-dark-brown/70 leading-relaxed">
-                                        Sharing recipes and stories from three generations of Palestinian and Lebanese cooking.
+                                        {t('blog.authorBio') || 'Sharing recipes and stories from three generations of Palestinian and Lebanese cooking.'}
                                     </p>
                                 </div>
 
                                 {/* Categories */}
-                                <div className="bg-white rounded-2xl p-6 shadow-soft border border-warm-beige/20">
-                                    <h3 className="font-serif-elegant text-lg text-dark-brown mb-4">Categories</h3>
-                                    <div className="flex flex-wrap gap-2">
+                                <div className={`bg-white rounded-2xl p-6 shadow-soft border border-warm-beige/20 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                    <h3 className="font-serif-elegant text-lg text-dark-brown mb-4">{t('blog.categories') || 'Categories'}</h3>
+                                    <div className={`flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                         {['Culture', 'Ingredients', 'Stories', 'Techniques', 'Traditions'].map((cat) => (
                                             <span
                                                 key={cat}
                                                 className="px-4 py-1.5 bg-warm-beige/50 text-dark-brown/70 rounded-full text-xs font-semibold hover:bg-olive-green hover:text-white transition-all cursor-pointer border border-transparent hover:border-olive-green shadow-sm"
                                             >
-                                                {cat}
+                                                {t(`blog.cat.${cat.toLowerCase()}`) || cat}
                                             </span>
                                         ))}
                                     </div>
@@ -236,7 +238,7 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
                 <section className="py-12 bg-warm-beige/30">
                     <div className="container mx-auto px-4">
                         <h2 className="font-serif-elegant text-3xl text-dark-brown mb-10 text-center">
-                            More Stories
+                            {t('blog.moreStories') || 'More Stories'}
                         </h2>
                         <div className="grid md:grid-cols-3 gap-8">
                             {relatedPosts.map((p) => (

@@ -57,9 +57,25 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   
   const df = (obj: any, field: string) => {
     if (!obj) return '';
-    if (language === 'ar' && obj[`${field}_ar`]) {
-      return obj[`${field}_ar`];
+    
+    if (language === 'ar') {
+      const fieldAr = `${field}_ar`;
+      const valAr = obj[fieldAr];
+      
+      // Check if Arabic value exists and is not empty (string or array)
+      if (valAr !== undefined && valAr !== null) {
+        if (typeof valAr === 'string' && valAr.trim() !== '') {
+          return valAr;
+        }
+        if (Array.isArray(valAr) && valAr.length > 0) {
+          // Additional check for array of empty strings
+          const hasContent = valAr.some(item => typeof item === 'string' && item.trim() !== '');
+          if (hasContent) return valAr;
+        }
+      }
     }
+    
+    // Fallback to English (primary field)
     return obj[field];
   };
 

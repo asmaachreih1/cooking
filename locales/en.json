@@ -87,7 +87,10 @@
     "gathering": "Gathering heritage recipes...",
     "noRecipesFound": "No recipes found",
     "noRecipesDesc": "We couldn't find any recipes matching your current filters. Try adjusting your search or clearing filters.",
-    "viewRecipe": "View Recipe"
+    "viewRecipe": "View Recipe",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
   },
   "blog": {
     "loadingStories": "Loading heritage stories...",
@@ -96,13 +99,20 @@
     "heroDesc": "Discover the stories behind our recipes, cooking techniques, and the rich cultural heritage of Palestinian and Lebanese cuisine.",
     "featuredStory": "Featured Story",
     "neverMissStory": "Never Miss a Story",
-    "subscribeDesc": "Subscribe to receive new blog posts, recipes, and cooking tips delivered straight to your inbox."
+    "subscribeDesc": "Subscribe to receive new blog posts, recipes, and cooking tips delivered straight to your inbox.",
+    "backToBlog": "Back to Blog",
+    "postNotFound": "Post Not Found",
+    "loadingPost": "Loading story..."
   },
   "news": {
     "fetchingNews": "Fetching heritage news...",
     "newsUpdates": "News & Updates",
     "heroDesc": "Stay updated with cultural events, seasonal cooking traditions, and announcements from our kitchen.",
-    "whatsHappening": "What's Happening"
+    "whatsHappening": "What's Happening",
+    "backToNews": "Back to News",
+    "articleNotFound": "Article Not Found",
+    "loadingNews": "Loading heritage update...",
+    "shareNews": "Share this news:"
   },
   "about": {
     "ourStory": "Our Story",

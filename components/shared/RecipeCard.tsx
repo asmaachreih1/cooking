@@ -16,7 +16,7 @@ const RecipeCard = ({ recipe }: RecipeCardProps) => {
         <div className="relative h-56 img-hover-zoom">
           <img
             src={recipe.image}
-            alt={recipe.title}
+            alt={df(recipe, 'title')}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 gradient-overlay" />
@@ -24,12 +24,12 @@ const RecipeCard = ({ recipe }: RecipeCardProps) => {
           {/* Category Badge */}
           <span className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} px-3 py-1 rounded-full text-xs font-medium ${recipe.category === 'lebanese' ? 'badge-lebanese' : 'badge-palestinian'
             }`}>
-            {recipe.category === 'lebanese' ? t('common.lebanese') : t('common.palestinian')}
+            {t(`recipes.${recipe.category}`)}
           </span>
 
           {/* Type Badge */}
           <span className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} bg-white/90 text-dark-brown px-3 py-1 rounded-full text-xs font-medium capitalize`}>
-            {recipe.type}
+            {t(`recipes.${recipe.type}`)}
           </span>
         </div>
 

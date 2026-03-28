@@ -39,11 +39,17 @@ const RecipesPage = () => {
 
     const filteredRecipes = useMemo(() => {
         return recipes.filter((recipe) => {
-            const title = recipe?.title?.toLowerCase() || '';
-            const description = recipe?.description?.toLowerCase() || '';
+            const title = (recipe?.title || '').toLowerCase();
+            const title_ar = (recipe?.title_ar || '').toLowerCase();
+            const description = (recipe?.description || '').toLowerCase();
+            const description_ar = (recipe?.description_ar || '').toLowerCase();
             const search = searchTerm.toLowerCase();
 
-            const matchesSearch = title.includes(search) || description.includes(search);
+            const matchesSearch = 
+                title.includes(search) || 
+                title_ar.includes(search) || 
+                description.includes(search) || 
+                description_ar.includes(search);
             
             const matchesCuisine = cuisineFilter === 'all' || 
                                  recipe.category?.toLowerCase() === cuisineFilter.toLowerCase();

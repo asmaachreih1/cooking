@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import {
-    ChefHat, Plus, Edit, Trash2, Eye, Filter, Search, XCircle, Image as ImageIcon, Loader2
+    ChefHat, Plus, Edit, Trash2, Eye, Filter, Search, XCircle, Image as ImageIcon, Loader2, Sparkles
 } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import { Recipe, PERMISSIONS } from '@/types';
 import { useAuth } from '@/context/AuthContext';
+import { translateFields } from '@/lib/translate-client';
 
 export default function RecipesManagement() {
     const { hasPermission } = useAuth();
@@ -39,6 +40,45 @@ export default function RecipesManagement() {
         story: '',
         story_ar: ''
     });
+    const [isTranslating, setIsTranslating] = useState(false);
+    const [showArabic, setShowArabic] = useState(false);
+
+    const handleTranslate = async () => {
+        if (!formData.title) {
+            alert('Please enter at least the English title to translate.');
+            return;
+        }
+
+        setIsTranslating(true);
+        try {
+            const fieldsToTranslate = {
+                title: formData.title,
+                description: formData.description,
+                ingredients: formData.ingredients,
+                instructions: formData.instructions,
+                tips: formData.tips,
+                story: formData.story
+            };
+
+            const translated = await translateFields(fieldsToTranslate);
+            if (translated) {
+                setFormData(prev => ({
+                    ...prev,
+                    title_ar: translated.title || prev.title_ar,
+                    description_ar: translated.description || prev.description_ar,
+                    ingredients_ar: translated.ingredients || prev.ingredients_ar,
+                    instructions_ar: translated.instructions || prev.instructions_ar,
+                    tips_ar: translated.tips || prev.tips_ar,
+                    story_ar: translated.story || prev.story_ar
+                }));
+            }
+        } catch (error) {
+            console.error('Translation error:', error);
+            alert('Failed to translate. Please try again or fill manually.');
+        } finally {
+            setIsTranslating(false);
+        }
+    };
 
     useEffect(() => {
         fetchRecipes();
@@ -74,18 +114,58 @@ export default function RecipesManagement() {
 
     const handleEdit = (recipe: Recipe) => {
         setEditingRecipe(recipe);
-        setFormData(recipe);
+        // Ensure all bilingual fields are initialized even if they don't exist in the recipe object yet
+        setFormData({
+            ...recipe,
+            title_ar: recipe.title_ar || '',
+            description_ar: recipe.description_ar || '',
+            ingredients_ar: recipe.ingredients_ar || [],
+            instructions_ar: recipe.instructions_ar || [],
+            tips_ar: recipe.tips_ar || '',
+            story_ar: recipe.story_ar || ''
+        });
         setShowRecipeForm(true);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         try {
+            let finalData = { ...formData };
+            
+            // Auto-translate if Arabic fields are empty
+            const needsTranslation = !finalData.title_ar || !finalData.description_ar || 
+                                   (finalData.ingredients_ar && finalData.ingredients_ar.length === 0) ||
+                                   (finalData.instructions_ar && finalData.instructions_ar.length === 0);
+            
+            if (needsTranslation && finalData.title) {
+                const translated = await translateFields({
+                    title: finalData.title,
+                    description: finalData.description,
+                    ingredients: finalData.ingredients,
+                    instructions: finalData.instructions,
+                    tips: finalData.tips,
+                    story: finalData.story
+                });
+                
+                if (translated) {
+                    finalData = {
+                        ...finalData,
+                        title_ar: finalData.title_ar || translated.title,
+                        description_ar: finalData.description_ar || translated.description,
+                        ingredients_ar: (finalData.ingredients_ar && finalData.ingredients_ar.length > 0) ? finalData.ingredients_ar : translated.ingredients,
+                        instructions_ar: (finalData.instructions_ar && finalData.instructions_ar.length > 0) ? finalData.instructions_ar : translated.instructions,
+                        tips_ar: finalData.tips_ar || translated.tips,
+                        story_ar: finalData.story_ar || translated.story
+                    };
+                }
+            }
+
             if (editingRecipe) {
                 const recipeRef = doc(db, 'recipes', editingRecipe.id);
-                await updateDoc(recipeRef, formData);
+                await updateDoc(recipeRef, finalData);
             } else {
-                await addDoc(collection(db, 'recipes'), formData);
+                await addDoc(collection(db, 'recipes'), finalData);
             }
             setShowRecipeForm(false);
             setEditingRecipe(null);
@@ -271,19 +351,45 @@ export default function RecipesManagement() {
                         <div className="p-8 border-b border-gray-100 flex items-center justify-between">
                             <div>
                                 <h3 className="text-2xl font-serif-elegant text-dark-brown">
-                                    {editingRecipe ? 'Edit Heritage Recipe' : 'Add New Heritage Recipe'}
+                                    {editingRecipe ? 'Edit Recipe' : 'Add New Recipe'}
                                 </h3>
-                                <p className="text-sm text-gray-500 font-medium">Capture the story and technique of a traditional dish.</p>
+                                <p className="text-sm text-gray-500 font-medium flex items-center gap-2">
+                                    Capture the essence of our family heritage.
+                                    <span className="inline-flex items-center gap-1 bg-olive-green/10 text-olive-green px-2 py-0.5 rounded-full text-[10px] uppercase tracking-widest font-bold">
+                                        Auto-Translating enabled
+                                    </span>
+                                </p>
                             </div>
-                            <button
-                                onClick={() => {
-                                    setShowRecipeForm(false);
-                                    setEditingRecipe(null);
-                                }}
-                                className="p-3 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-dark-brown"
-                            >
-                                <XCircle className="w-6 h-6" />
-                            </button>
+                            <div className="flex items-center gap-4">
+                                <label className="flex items-center gap-2 cursor-pointer bg-gray-50 px-3 py-2 rounded-xl border border-gray-100 mr-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={showArabic}
+                                        onChange={(e) => setShowArabic(e.target.checked)}
+                                        className="w-4 h-4 rounded border-gray-300 text-olive-green focus:ring-olive-green"
+                                    />
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Show Arabic Fields</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    onClick={handleTranslate}
+                                    disabled={isTranslating}
+                                    className="flex items-center gap-2 bg-olive-green/10 text-olive-green px-4 py-2 rounded-xl hover:bg-olive-green hover:text-white transition-all font-bold text-xs disabled:opacity-50"
+                                >
+                                    {isTranslating ? (
+                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                        <Sparkles className="w-3 h-3" />
+                                    )}
+                                    <span>{isTranslating ? 'Preview Arabic' : 'Magic Translate'}</span>
+                                </button>
+                                <button
+                                    onClick={() => setShowRecipeForm(false)}
+                                    className="p-3 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-dark-brown"
+                                >
+                                    <XCircle className="w-6 h-6" />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
@@ -312,7 +418,7 @@ export default function RecipesManagement() {
                                             placeholder="e.g., Mom's Authentic Musakhan"
                                         />
                                     </div>
-                                    <div className="md:col-span-1">
+                                    <div className={`md:col-span-1 ${!showArabic && 'hidden'}`}>
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Recipe Title (AR)</label>
                                         <input
                                             type="text"
@@ -333,7 +439,7 @@ export default function RecipesManagement() {
                                             placeholder="Short description..."
                                         />
                                     </div>
-                                    <div className="md:col-span-1">
+                                    <div className={`md:col-span-1 ${!showArabic && 'hidden'}`}>
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Description (AR)</label>
                                         <textarea
                                             value={formData.description_ar}
@@ -438,7 +544,7 @@ export default function RecipesManagement() {
                                                 placeholder="One ingredient per line..."
                                             />
                                         </div>
-                                        <div>
+                                        <div className={!showArabic ? 'hidden' : ''}>
                                             <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Ingredients (AR)</label>
                                             <textarea
                                                 rows={4}
@@ -461,7 +567,7 @@ export default function RecipesManagement() {
                                                 placeholder="Describe the method..."
                                             />
                                         </div>
-                                        <div>
+                                        <div className={!showArabic ? 'hidden' : ''}>
                                             <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Instructions (AR)</label>
                                             <textarea
                                                 rows={6}
@@ -487,7 +593,7 @@ export default function RecipesManagement() {
                                                 placeholder="Story in English..."
                                             />
                                         </div>
-                                        <div>
+                                        <div className={!showArabic ? 'hidden' : ''}>
                                             <label className="block text-[10px] font-bold text-olive-green uppercase tracking-widest mb-2">Story (AR)</label>
                                             <textarea
                                                 rows={4}
@@ -510,7 +616,7 @@ export default function RecipesManagement() {
                                                 placeholder="Tips in English..."
                                             />
                                         </div>
-                                        <div>
+                                        <div className={!showArabic ? 'hidden' : ''}>
                                             <label className="block text-[10px] font-bold text-terracotta uppercase tracking-widest mb-2">Tips (AR)</label>
                                             <textarea
                                                 rows={4}

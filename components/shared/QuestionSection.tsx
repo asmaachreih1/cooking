@@ -11,7 +11,7 @@ interface QuestionSectionProps {
 }
 
 export default function QuestionSection({ recipeId, category }: QuestionSectionProps) {
-    const { t, isRTL } = useLanguage();
+    const { t, language, isRTL, df } = useLanguage();
     const [questions, setQuestions] = useState<any[]>([]);
     const [newQuestion, setNewQuestion] = useState('');
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -33,7 +33,14 @@ export default function QuestionSection({ recipeId, category }: QuestionSectionP
         e.preventDefault();
         if (!newQuestion.trim()) return;
         setIsSubmitting(true);
-        const res = await submitQuestion(recipeId, newQuestion);
+        
+        // If Arabic, send to content_ar, otherwise content
+        const res = await submitQuestion(
+            recipeId, 
+            language === 'ar' ? '' : newQuestion, 
+            language === 'ar' ? newQuestion : undefined
+        );
+        
         if (res.success) {
             setNewQuestion('');
             fetchQuestions();
@@ -44,7 +51,14 @@ export default function QuestionSection({ recipeId, category }: QuestionSectionP
     const handleReplySubmit = async (commentId: string) => {
         if (!replyContent.trim()) return;
         setIsSubmitting(true);
-        const res = await submitReply(commentId, replyContent, recipeId);
+        
+        const res = await submitReply(
+            commentId, 
+            language === 'ar' ? '' : replyContent, 
+            recipeId,
+            language === 'ar' ? replyContent : undefined
+        );
+
         if (res.success) {
             setReplyContent('');
             setReplyingTo(null);
@@ -116,7 +130,7 @@ export default function QuestionSection({ recipeId, category }: QuestionSectionP
                                                 <span className="font-serif-elegant font-bold text-dark-brown">{q.author === 'Mom' ? t('questionSection.momAuthor') : q.author}</span>
                                                 <span className="text-xs text-dark-brown/30">{new Date(q.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}</span>
                                             </div>
-                                            <p className={`text-dark-brown/80 leading-relaxed font-light ${isRTL ? 'text-right' : 'text-left'}`}>{q.content}</p>
+                                            <p className={`text-dark-brown/80 leading-relaxed font-light ${isRTL ? 'text-right' : 'text-left'}`}>{df(q, 'content') || q.content}</p>
 
                                             <button
                                                 onClick={() => setReplyingTo(replyingTo === q.id ? null : q.id)}
@@ -140,7 +154,7 @@ export default function QuestionSection({ recipeId, category }: QuestionSectionP
                                                         <span className="font-serif-elegant font-bold text-dark-brown text-sm">{r.author === 'Mom' ? t('questionSection.momAuthor') : r.author}</span>
                                                         <span className="text-[10px] text-dark-brown/30">{new Date(r.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}</span>
                                                     </div>
-                                                    <p className={`text-dark-brown/70 text-sm leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>{r.content}</p>
+                                                    <p className={`text-dark-brown/70 text-sm leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>{df(r, 'content') || r.content}</p>
                                                 </div>
                                             </div>
                                         ))}

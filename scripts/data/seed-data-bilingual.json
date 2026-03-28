@@ -1,0 +1,120 @@
+{
+  "recipes": [
+    {
+      "id": "musakhan",
+      "title": "Musakhan",
+      "title_ar": "مسخن",
+      "category": "palestinian",
+      "difficulty": "medium",
+      "prepTime": "30 min",
+      "cookTime": "1.5 hours",
+      "servings": 6,
+      "description": "Iconic Palestinian dish of roasted chicken on sumac-onion flatbread with toasted pine nuts.",
+      "description_ar": "طبق فلسطيني أيقوني من الدجاج المشوي على خبز الطابون مع البصل والسماق والصنوبر المحمص.",
+      "image": "https://falasteenifoodie.com/wp-content/uploads/2024/10/WhatsApp-Image-2022-11-10-at-5.19.34-PM-1199x800.jpg",
+      "ingredients": [
+        "1 whole chicken, quartered",
+        "6 large onions, sliced thin",
+        "1/2 cup sumac",
+        "1/4 cup olive oil",
+        "1 tsp allspice",
+        "1/2 cup pine nuts, toasted",
+        "4 taboon or pita breads"
+      ],
+      "ingredients_ar": [
+        "دجاجة كاملة، مقطعة إلى أرباع",
+        "6 بصلات كبيرة، مقطعة شرائح رقيقة",
+        "نصف كوب سماق",
+        "ربع كوب زيت زيتون",
+        "1 ملعقة صغيرة بهارات مشكلة",
+        "نصف كوب صنوبر محمص",
+        "4 أرغفة خبز طابون أو بيتا"
+      ],
+      "instructions": [
+        "Season chicken with salt, pepper, and half the sumac. Roast until cooked.",
+        "Slowly caramelize onions in olive oil until deeply golden, about 45 minutes.",
+        "Add remaining sumac and allspice to onions.",
+        "Warm flatbreads, then spread generously with onion mixture.",
+        "Place roasted chicken pieces on top.",
+        "Drizzle with more olive oil and top with toasted pine nuts."
+      ],
+      "instructions_ar": [
+        "تبلي الدجاج بالملح والفلفل ونصف كمية السماق. اشويه حتى ينضج.",
+        "كرملي البصل ببطء في زيت الزيتون حتى يصبح ذهبياً غامقاً، حوالي 45 دقيقة.",
+        "أضيفي السماق المتبقي والبهارات المشكلة إلى البصل.",
+        "سخني خبز الطابون، ثم وزعي خليط البصل بسخاء.",
+        "ضعي قطع الدجاج المشوي في الأعلى.",
+        "رشي المزيد من زيت الزيتون وزيني بالصنوبر المحمص."
+      ],
+      "story": "Musakhan is the national dish of Palestine. It was traditionally made during olive harvest season, celebrating the new oil.",
+      "story_ar": "المسخن هو الطبق الوطني لفلسطين. كان يُصنع تقليدياً خلال موسم حصاد الزيتون، احتفالاً بالزيت الجديد.",
+      "tips": "The onions must be cooked low and slow until they're deeply caramelized.",
+      "tips_ar": "يجب طهي البصل على نار هادئة وببطء حتى يتكرمل تماماً."
+    },
+    {
+      "id": "knafeh",
+      "title": "Palestinian Knafeh",
+      "title_ar": "كنافة نابلسية",
+      "category": "palestinian",
+      "difficulty": "medium",
+      "prepTime": "30 min",
+      "cookTime": "45 min",
+      "servings": 12,
+      "description": "A beloved Palestinian dessert of crispy shredded phyllo with stretchy cheese, soaked in sweet rose syrup.",
+      "description_ar": "حلوى فلسطينية محبوبة من عجينة الكنافة المقرمشة مع الجبن المتمطط، مغموسة بقطر الورد الحلو.",
+      "image": "https://palestineinadish.com/wp-content/uploads/2023/11/Knafeh-main-photo-2-1-scaled.jpg",
+      "ingredients": [
+        "1 lb kataifi (shredded phyllo dough)",
+        "1 cup melted butter",
+        "1 lb akkawi cheese, soaked overnight",
+        "2 cups water",
+        "1 tbsp rose water",
+        "Crushed pistachios for garnish"
+      ],
+      "ingredients_ar": [
+        "1 رطل عجينة كنافة (خيوط الشعر)",
+        "1 كوب زبدة مذابة",
+        "1 رطل جبن عكاوي، منقوع طوال الليل",
+        "2 كوب ماء",
+        "1 ملعقة كبيرة ماء ورد",
+        "فستق حلبي مطحون للتزيين"
+      ],
+      "instructions": [
+        "Make syrup, cool completely.",
+        "Mix shredded kataifi with melted butter.",
+        "Press half the kataifi into a pan, layer cheese, top with remaining kataifi.",
+        "Bake at 350°F for 45 minutes until golden.",
+        "Pour cold syrup over hot knafeh.",
+        "Garnish with pistachios and serve hot."
+      ],
+      "instructions_ar": [
+        "حضري القطر واتركيه يبرد تماماً.",
+        "اخلطي عجينة الكنافة المقطعة بالزبدة المذابة.",
+        "رصي نصف العجينة في صينية، ضعي طبقة الجبن، ثم غطيها بالمتبقي من العجينة.",
+        "اخبزيها على حرارة 350 درجة لمدة 45 دقيقة حتى تصبح ذهبية.",
+        "صبي القطر البارد فوق الكنافة الساخنة.",
+        "زينيها بالفستق الحلبي وقدميها ساخنة."
+      ],
+      "story": "Nablus is famous for knafeh, and every family has their own secret touch.",
+      "story_ar": "تشتهر نابلس بالكنافة، ولكل عائلة سرها الخاص في تحضيرها.",
+      "tips": "The secret to perfect knafeh is using well-desalinated cheese.",
+      "tips_ar": "سر الكنافة المثالية هو استخدام جبن محلى جيداً (منزوع الملح)."
+    }
+  ],
+  "blogs": [],
+  "news": [
+    {
+      "id": "cookbook-release",
+      "title": "New Cookbook: \"From Our Kitchen to Yours\" Coming Soon",
+      "title_ar": "كتاب طبخ جديد: \"من مطبخنا إلى مطبخكم\" قريباً",
+      "category": "Announcement",
+      "category_ar": "إعلان",
+      "date": "2026-03-01",
+      "excerpt": "We're excited to announce our upcoming cookbook featuring 100 family recipes.",
+      "excerpt_ar": "يسعدنا الإعلان عن كتاب الطبخ القادم الذي يضم 100 وصفة عائلية.",
+      "image": "/images/cookbook-cover.png",
+      "content": "After years of sharing recipes on this website, we're thrilled to announce that our family cookbook is finally becoming a reality.",
+      "content_ar": "بعد سنوات من مشاركة الوصفات على هذا الموقع، يسعدنا أن نعلن أن كتاب الطبخ العائلي الخاص بنا أصبح أخيراً حقيقة واقعة."
+    }
+  ]
+}

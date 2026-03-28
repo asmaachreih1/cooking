@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import {
-    FileText, Plus, Edit, Trash2, Search, Filter, XCircle, Image as ImageIcon, Loader2
+    BookOpen, Plus, Edit, Trash2, Search, XCircle, Loader2, Sparkles, Image as ImageIcon
 } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import { BlogPost, PERMISSIONS } from '@/types';
 import { useAuth } from '@/context/AuthContext';
+import { translateFields } from '@/lib/translate-client';
 
 export default function BlogManagement() {
     const { hasPermission } = useAuth();
@@ -17,6 +18,8 @@ export default function BlogManagement() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('all');
     const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
+    const [isTranslating, setIsTranslating] = useState(false);
+    const [showArabic, setShowArabic] = useState(false);
     const [formData, setFormData] = useState<Partial<BlogPost>>({
         title: '',
         title_ar: '',
@@ -25,11 +28,42 @@ export default function BlogManagement() {
         content: '',
         content_ar: '',
         image: '',
-        author: '',
         date: new Date().toISOString().split('T')[0],
-        category: 'Culture',
+        category: 'Heritage',
+        author: 'Mama Montaha',
         readTime: '5 min read'
     });
+
+    const handleTranslate = async () => {
+        if (!formData.title) {
+            alert('Please enter at least the English title to translate.');
+            return;
+        }
+
+        setIsTranslating(true);
+        try {
+            const fieldsToTranslate = {
+                title: formData.title,
+                excerpt: formData.excerpt,
+                content: formData.content
+            };
+
+            const translated = await translateFields(fieldsToTranslate);
+            if (translated) {
+                setFormData(prev => ({
+                    ...prev,
+                    title_ar: translated.title || prev.title_ar,
+                    excerpt_ar: translated.excerpt || prev.excerpt_ar,
+                    content_ar: translated.content || prev.content_ar
+                }));
+            }
+        } catch (error) {
+            console.error('Translation error:', error);
+            alert('Failed to translate. Please try again or fill manually.');
+        } finally {
+            setIsTranslating(false);
+        }
+    };
 
     useEffect(() => {
         fetchPosts();
@@ -65,18 +99,46 @@ export default function BlogManagement() {
 
     const handleEdit = (post: BlogPost) => {
         setEditingPost(post);
-        setFormData(post);
+        setFormData({
+            ...post,
+            title_ar: post.title_ar || '',
+            excerpt_ar: post.excerpt_ar || '',
+            content_ar: post.content_ar || ''
+        });
         setShowPostForm(true);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         try {
+            let finalData = { ...formData };
+            
+            // Auto-translate if Arabic fields are empty
+            const needsTranslation = !finalData.title_ar || !finalData.excerpt_ar || !finalData.content_ar;
+            
+            if (needsTranslation && finalData.title) {
+                const translated = await translateFields({
+                    title: finalData.title,
+                    excerpt: finalData.excerpt,
+                    content: finalData.content
+                });
+                
+                if (translated) {
+                    finalData = {
+                        ...finalData,
+                        title_ar: finalData.title_ar || translated.title,
+                        excerpt_ar: finalData.excerpt_ar || translated.excerpt,
+                        content_ar: finalData.content_ar || translated.content
+                    };
+                }
+            }
+
             if (editingPost) {
                 const postRef = doc(db, 'blog', editingPost.id);
-                await updateDoc(postRef, formData);
+                await updateDoc(postRef, finalData);
             } else {
-                await addDoc(collection(db, 'blog'), formData);
+                await addDoc(collection(db, 'blog'), finalData);
             }
             setShowPostForm(false);
             setEditingPost(null);
@@ -87,9 +149,10 @@ export default function BlogManagement() {
                 excerpt_ar: '',
                 content: '',
                 content_ar: '',
-                author: '',
-                category: 'Culture',
-                date: new Date().toISOString().split('T')[0]
+                image: '',
+                date: new Date().toISOString().split('T')[0],
+                category: 'Heritage',
+                author: 'Mama Montaha'
             });
             fetchPosts();
         } catch (error) {
@@ -143,10 +206,9 @@ export default function BlogManagement() {
                                 content: '',
                                 content_ar: '',
                                 image: '',
-                                author: '',
                                 date: new Date().toISOString().split('T')[0],
-                                category: 'Culture',
-                                readTime: '5 min read'
+                                category: 'Heritage',
+                                author: 'Mama Montaha'
                             });
                             setShowPostForm(true);
                         }}
@@ -168,7 +230,7 @@ export default function BlogManagement() {
                                 <th className="px-8 py-5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Category</th>
                                 <th className="px-8 py-5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date</th>
                                 <th className="px-8 py-5 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Actions</th>
-                  </tr>
+                            </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
                             {loading ? (
@@ -238,16 +300,45 @@ export default function BlogManagement() {
                         <div className="p-8 border-b border-gray-100 flex items-center justify-between">
                             <div>
                                 <h3 className="text-2xl font-serif-elegant text-dark-brown">
-                                    {editingPost ? 'Edit Heritage Story' : 'New Heritage Story'}
+                                    {editingPost ? 'Edit Blog Post' : 'Create New Post'}
                                 </h3>
-                                <p className="text-sm text-gray-500 font-medium">Share yours insights, techniques and culinary tales.</p>
+                                <p className="text-sm text-gray-500 font-medium flex items-center gap-2">
+                                    Share your stories and insights with the community.
+                                    <span className="inline-flex items-center gap-1 bg-olive-green/10 text-olive-green px-2 py-0.5 rounded-full text-[10px] uppercase tracking-widest font-bold">
+                                        Auto-Translating enabled
+                                    </span>
+                                </p>
                             </div>
-                            <button
-                                onClick={() => setShowPostForm(false)}
-                                className="p-3 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-dark-brown"
-                            >
-                                <XCircle className="w-6 h-6" />
-                            </button>
+                            <div className="flex items-center gap-4">
+                                <label className="flex items-center gap-2 cursor-pointer bg-gray-50 px-3 py-2 rounded-xl border border-gray-100 mr-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={showArabic}
+                                        onChange={(e) => setShowArabic(e.target.checked)}
+                                        className="w-4 h-4 rounded border-gray-300 text-olive-green focus:ring-olive-green"
+                                    />
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Show Arabic Fields</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    onClick={handleTranslate}
+                                    disabled={isTranslating}
+                                    className="flex items-center gap-2 bg-olive-green/10 text-olive-green px-4 py-2 rounded-xl hover:bg-olive-green hover:text-white transition-all font-bold text-xs disabled:opacity-50"
+                                >
+                                    {isTranslating ? (
+                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                        <Sparkles className="w-3 h-3" />
+                                    )}
+                                    <span>{isTranslating ? 'Preview Arabic' : 'Magic Translate'}</span>
+                                </button>
+                                <button
+                                    onClick={() => setShowPostForm(false)}
+                                    className="p-3 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-dark-brown"
+                                >
+                                    <XCircle className="w-6 h-6" />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
@@ -264,7 +355,7 @@ export default function BlogManagement() {
                                             placeholder="e.g., The Secret to Perfect Tahdig"
                                         />
                                     </div>
-                                    <div className="md:col-span-1">
+                                    <div className={`md:col-span-1 ${!showArabic && 'hidden'}`}>
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Story Title (AR)</label>
                                         <input
                                             type="text"
@@ -286,7 +377,7 @@ export default function BlogManagement() {
                                             placeholder="A brief summary..."
                                         />
                                     </div>
-                                    <div className="md:col-span-1">
+                                    <div className={`md:col-span-1 ${!showArabic && 'hidden'}`}>
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Excerpt (AR)</label>
                                         <textarea
                                             value={formData.excerpt_ar}
@@ -361,7 +452,7 @@ export default function BlogManagement() {
                                             placeholder="Tell the story in English..."
                                         />
                                     </div>
-                                    <div className="md:col-span-1">
+                                    <div className={`md:col-span-1 ${!showArabic && 'hidden'}`}>
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Content (AR)</label>
                                         <textarea
                                             rows={12}

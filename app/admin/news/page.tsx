@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import {
-    Newspaper, Plus, Edit, Trash2, Search, XCircle, Loader2
+    Newspaper, Plus, Edit, Trash2, Search, XCircle, Loader2, Sparkles
 } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import { NewsItem, PERMISSIONS } from '@/types';
 import { useAuth } from '@/context/AuthContext';
+import { translateFields } from '@/lib/translate-client';
 
 export default function NewsManagement() {
     const { hasPermission } = useAuth();
@@ -17,6 +18,9 @@ export default function NewsManagement() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('all');
     const [editingNews, setEditingNews] = useState<NewsItem | null>(null);
+    const [isTranslating, setIsTranslating] = useState(false);
+    const [showArabic, setShowArabic] = useState(false);
+
     const [formData, setFormData] = useState<Partial<NewsItem>>({
         title: '',
         title_ar: '',
@@ -28,6 +32,37 @@ export default function NewsManagement() {
         date: new Date().toISOString().split('T')[0],
         category: 'Event'
     });
+
+    const handleTranslate = async () => {
+        if (!formData.title) {
+            alert('Please enter at least the English title to translate.');
+            return;
+        }
+
+        setIsTranslating(true);
+        try {
+            const fieldsToTranslate = {
+                title: formData.title,
+                excerpt: formData.excerpt,
+                content: formData.content
+            };
+
+            const translated = await translateFields(fieldsToTranslate);
+            if (translated) {
+                setFormData(prev => ({
+                    ...prev,
+                    title_ar: translated.title || prev.title_ar,
+                    excerpt_ar: translated.excerpt || prev.excerpt_ar,
+                    content_ar: translated.content || prev.content_ar
+                }));
+            }
+        } catch (error) {
+            console.error('Translation error:', error);
+            alert('Failed to translate. Please try again or fill manually.');
+        } finally {
+            setIsTranslating(false);
+        }
+    };
 
     useEffect(() => {
         fetchNews();
@@ -63,18 +98,46 @@ export default function NewsManagement() {
 
     const handleEdit = (item: NewsItem) => {
         setEditingNews(item);
-        setFormData(item);
+        setFormData({
+            ...item,
+            title_ar: item.title_ar || '',
+            excerpt_ar: item.excerpt_ar || '',
+            content_ar: item.content_ar || ''
+        });
         setShowNewsForm(true);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         try {
+            let finalData = { ...formData };
+            
+            // Auto-translate if Arabic fields are empty
+            const needsTranslation = !finalData.title_ar || !finalData.excerpt_ar || !finalData.content_ar;
+            
+            if (needsTranslation && finalData.title) {
+                const translated = await translateFields({
+                    title: finalData.title,
+                    excerpt: finalData.excerpt,
+                    content: finalData.content
+                });
+                
+                if (translated) {
+                    finalData = {
+                        ...finalData,
+                        title_ar: finalData.title_ar || translated.title,
+                        excerpt_ar: finalData.excerpt_ar || translated.excerpt,
+                        content_ar: finalData.content_ar || translated.content
+                    };
+                }
+            }
+
             if (editingNews) {
                 const docRef = doc(db, 'news', editingNews.id);
-                await updateDoc(docRef, formData);
+                await updateDoc(docRef, finalData);
             } else {
-                await addDoc(collection(db, 'news'), formData);
+                await addDoc(collection(db, 'news'), finalData);
             }
             setShowNewsForm(false);
             setEditingNews(null);
@@ -232,14 +295,43 @@ export default function NewsManagement() {
                                 <h3 className="text-2xl font-serif-elegant text-dark-brown">
                                     {editingNews ? 'Edit News Article' : 'Post New Article'}
                                 </h3>
-                                <p className="text-sm text-gray-500 font-medium">Keep the community informed about our journey.</p>
+                                <p className="text-sm text-gray-500 font-medium flex items-center gap-2">
+                                    Keep the community informed about our journey.
+                                    <span className="inline-flex items-center gap-1 bg-olive-green/10 text-olive-green px-2 py-0.5 rounded-full text-[10px] uppercase tracking-widest font-bold">
+                                        Auto-Translating enabled
+                                    </span>
+                                </p>
                             </div>
-                            <button
-                                onClick={() => setShowNewsForm(false)}
-                                className="p-3 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-dark-brown"
-                            >
-                                <XCircle className="w-6 h-6" />
-                            </button>
+                            <div className="flex items-center gap-4">
+                                <label className="flex items-center gap-2 cursor-pointer bg-gray-50 px-3 py-2 rounded-xl border border-gray-100 mr-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={showArabic}
+                                        onChange={(e) => setShowArabic(e.target.checked)}
+                                        className="w-4 h-4 rounded border-gray-300 text-olive-green focus:ring-olive-green"
+                                    />
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Show Arabic Fields</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    onClick={handleTranslate}
+                                    disabled={isTranslating}
+                                    className="flex items-center gap-2 bg-olive-green/10 text-olive-green px-4 py-2 rounded-xl hover:bg-olive-green hover:text-white transition-all font-bold text-xs disabled:opacity-50"
+                                >
+                                    {isTranslating ? (
+                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                        <Sparkles className="w-3 h-3" />
+                                    )}
+                                    <span>{isTranslating ? 'Preview Arabic' : 'Magic Translate'}</span>
+                                </button>
+                                <button
+                                    onClick={() => setShowNewsForm(false)}
+                                    className="p-3 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-dark-brown"
+                                >
+                                    <XCircle className="w-6 h-6" />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
@@ -256,7 +348,7 @@ export default function NewsManagement() {
                                             placeholder="e.g., Opening Our New Heritage Kitchen"
                                         />
                                     </div>
-                                    <div className="md:col-span-1">
+                                    <div className={`md:col-span-1 ${!showArabic && 'hidden'}`}>
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Article Title (AR)</label>
                                         <input
                                             type="text"
@@ -278,7 +370,7 @@ export default function NewsManagement() {
                                             placeholder="A short summary..."
                                         />
                                     </div>
-                                    <div className="md:col-span-1">
+                                    <div className={`md:col-span-1 ${!showArabic && 'hidden'}`}>
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Excerpt (AR)</label>
                                         <textarea
                                             value={formData.excerpt_ar}
@@ -332,7 +424,7 @@ export default function NewsManagement() {
                                             placeholder="Full article in English..."
                                         />
                                     </div>
-                                    <div className="md:col-span-1">
+                                    <div className={`md:col-span-1 ${!showArabic && 'hidden'}`}>
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Content (AR)</label>
                                         <textarea
                                             rows={12}
