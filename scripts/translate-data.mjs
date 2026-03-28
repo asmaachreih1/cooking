@@ -6,7 +6,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 dotenv.config({ path: '.env' });
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+const model = genAI.getGenerativeModel({ model: 'gemini-flash-lite-latest' });
 
 async function translateObject(obj, type) {
     console.log(`Translating ${type}: ${obj.title || obj.id}...`);

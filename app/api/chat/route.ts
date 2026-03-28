@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-lite-latest" });
 
     const systemPrompt = `You are "Ask Mom" (Mama Montaha), a warm Palestinian mother helping with traditional cooking. 
 Be friendly, simple, and helpful. Use a warm, motherly tone (e.g., "Habibi", "My dear", "Welcome to my kitchen").

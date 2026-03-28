@@ -11,7 +11,7 @@ export async function getTranslation(text: string, targetLang: 'ar' | 'en' = 'ar
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-lite-latest" });
 
     const prompt = `Translate the following text to ${targetLang === 'ar' ? 'Arabic' : 'English'}. 
     Provide ONLY the translation, no explanations, no quotes unless they are in the source.
