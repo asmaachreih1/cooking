@@ -296,20 +296,20 @@ export default function Home() {
           <div className="bg-gradient-to-r from-olive-green to-light-olive rounded-3xl p-6 md:p-12 text-center text-white relative overflow-hidden">
             <div className="absolute inset-0 tatreez-pattern opacity-10" />
             <div className="relative z-10 max-w-2xl mx-auto">
-              <h2 className="font-serif-elegant text-4xl mb-4">
+              <h2 className="font-serif-elegant text-3xl md:text-4xl mb-4">
                 {t('home.joinJourney')}
               </h2>
-              <p className="text-white/80 mb-8">
+              <p className="text-white/80 mb-8 text-sm md:text-base">
                 {t('home.subscribeDesc')}
               </p>
               <div className="max-w-md mx-auto">
-                <div className="bg-white rounded-full p-1.5 flex flex-col sm:flex-row items-center shadow-lg">
+                <div className="bg-white rounded-2xl sm:rounded-full p-1.5 flex flex-col sm:flex-row items-stretch sm:items-center shadow-lg gap-2 sm:gap-0">
                   <input
                     type="email"
                     placeholder={t('home.emailPlaceholder')}
-                    className="w-full sm:flex-1 bg-transparent px-6 py-3 text-dark-brown focus:outline-none placeholder:text-dark-brown/40"
+                    className="w-full sm:flex-1 bg-transparent px-6 py-3.5 text-dark-brown focus:outline-none placeholder:text-dark-brown/40 text-sm"
                   />
-                  <button className="w-full sm:w-auto bg-dark-brown text-white px-8 py-3 rounded-full font-medium hover:bg-terracotta transition-colors shadow-md">
+                  <button className="bg-dark-brown text-white px-8 py-3.5 rounded-xl sm:rounded-full font-bold text-sm hover:bg-terracotta transition-all shadow-md active:scale-95">
                     {t('home.subscribe')}
                   </button>
                 </div>
