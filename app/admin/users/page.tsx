@@ -33,9 +33,9 @@ export default function UserManagement() {
             ]);
 
             const usersData = usersSnap.docs.map(doc => ({
-                id: doc.id,
+                uid: doc.id,
                 ...doc.data()
-            })) as UserAccount[];
+            })) as any as UserAccount[];
 
             const rolesData = rolesSnap.docs.map(doc => ({
                 id: doc.id,
